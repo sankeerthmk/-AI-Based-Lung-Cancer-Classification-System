@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI-powered lung cancer detection System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered lung cancer detection from CT scans">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2a7fba;
+            --primary-dark: #1a5f8b;
+            --secondary: #4fc3f7;
+            --accent: #e57373;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --success: #66bb6a;
+            --warning: #ffa726;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Roboto', sans-serif;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                            url('{{ url_for("static", filename="gggggggggggggg.jpg") }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            color: var(--dark);
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .header-icon {
+            background-color: var(--primary);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2.5rem;
+            box-shadow: 0 5px 15px rgba(42, 127, 186, 0.3);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--gray);
+            font-weight: 400;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .form-container {
+            margin: 2rem 0;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem;
+            border: 2px dashed var(--light-gray);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: rgba(74, 144, 226, 0.05);
+            text-align: center;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--primary);
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+
+        .file-upload-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-text {
+            font-size: 1rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-name {
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 500;
+            margin-top: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .file-requirements {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 0.5rem;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            box-shadow: 0 4px 12px rgba(42, 127, 186, 0.2);
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(42, 127, 186, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(74, 144, 226, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .result-container {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background-color: rgba(102, 187, 106, 0.1);
+            border-left: 4px solid var(--success);
+            display: none;
+        }
+
+        .result-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--success);
+            margin-bottom: 0.5rem;
+        }
+
+        .confidence {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .features {
+            margin-top: 2rem;
+        }
+
+        .features-title {
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .features-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        .feature-icon {
+            color: var(--primary);
+            font-size: 0.7rem;
+        }
+
+        .disclaimer {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--gray);
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.7rem;
+            }
+            
+            .features-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .file-upload-label {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">
+                <i class="fas fa-lungs"></i>
+            </div>
+            <h1>AI-powered lung cancer detection</h1>
+            <p class="subtitle">Upload a CT scan report for AI-powered analysis and early detection</p>
+        </div>
+        
+        <div class="form-container">
+            <form id="predictionForm" action="/predict" method="post" enctype="multipart/form-data">
+                <div class="file-upload-wrapper">
+                    <label class="file-upload-label" for="fileInput">
+                        <div class="file-upload-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div class="file-upload-text">Click to upload CT scan image</div>
+                        <div class="file-name" id="fileName">No file selected</div>
+                        <div class="file-requirements">Supports: JPG, PNG, DICOM (Max 10MB)</div>
+                    </label>
+                    <input type="file" id="fileInput" name="image" accept="image/*,.dcm" required>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <i class="fas fa-search"></i>
+                    Analyze Scan
+                </button>
+            </form>
+            
+            <div class="loading-indicator" id="loadingIndicator">
+                <div class="loading-spinner"></div>
+                <p>Processing your CT scan...</p>
+            </div>
+            
+            {% if prediction %}
+            <div class="result-container" id="resultContainer" style="display: block;">
+                <div class="result-title">Analysis Result</div>
+                <div class="result-value">{{ prediction }}</div>
+                {% if confidence %}
+                <div class="confidence">Confidence level: {{ confidence }}%</div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="features">
+            <h3 class="features-title">
+                <i class="fas fa-check-circle"></i>
+                What We Detect
+            </h3>
+            <ul class="features-list">
+                <li class="feature-item">
+                    <i class="fas fa-check feature-icon"></i>
+                    Lung nodules
+                </li>
+                <li class="feature-item">
+                    <i class="fas fa-check feature-icon"></i>
+                    Tumors
+                </li>
+                <li class="feature-item">
+                    <i class="fas fa-check feature-icon"></i>
+                    Mass lesions
+                </li>
+                <li class="feature-item">
+                    <i class="fas fa-check feature-icon"></i>
+                    Suspicious patterns
+                </li>
+                <li class="feature-item">
+                    <i class="fas fa-check feature-icon"></i>
+                    Early-stage signs
+                </li>
+                <li class="feature-item">
+                    <i class="fas fa-check feature-icon"></i>
+                    Abnormal growths
+                </li>
+            </ul>
+        </div>
+        
+        <div class="disclaimer">
+            <p>This tool is for medical professionals only. Results should be interpreted by qualified radiologists.</p>
+        </div>
+    </div>
+
+    <script>
+        // File input handling
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const form = document.getElementById('predictionForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const resultContainer = document.getElementById('resultContainer');
+        
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+            } else {
+                fileName.textContent = 'No file selected';
+            }
+        });
+        
+        form.addEventListener('submit', function() {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            loadingIndicator.style.display = 'block';
+            if (resultContainer) resultContainer.style.display = 'none';
+        });
+        
+        // Reset form if there's an error
+        if (window.history.state && window.history.state.formReset) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-search"></i> Analyze Scan';
+            loadingIndicator.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
